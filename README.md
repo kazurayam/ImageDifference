@@ -24,3 +24,6 @@ The `com.kazurayam.imagedifference.ImageDifference` class implements the core fu
 The accompanying class `com.kazurayam.imagedifference.ImageDifferenceSerializer` class is a utilitiy to
 serialize 3 images into file: the expected image, the actual image and the difference image.
 
+## API documentation
+
+see [ImageDifference API](docs/index.html)

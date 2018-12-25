@@ -26,4 +26,4 @@ serialize 3 images into file: the expected image, the actual image and the diffe
 
 ## API documentation
 
-see [ImageDifference API](docs/index.html)
+see [ImageDifference API](https://kazurayam.github.io/ImageDifference/docs/index.html)

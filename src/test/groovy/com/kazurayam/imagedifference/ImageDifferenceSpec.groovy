@@ -26,8 +26,8 @@ class ImageDifferenceSpec extends Specification {
     
     def testSimilarImages() {
         setup:
-        BufferedImage bix = ImageIO.read(image1_)
-        BufferedImage biy = ImageIO.read(image1_)
+        BufferedImage bix = ImageIO.read(image6_)
+        BufferedImage biy = ImageIO.read(image6_)
         when:
         ImageDifference difference = new ImageDifference(bix, biy)
         difference.setCriteria(15.0)

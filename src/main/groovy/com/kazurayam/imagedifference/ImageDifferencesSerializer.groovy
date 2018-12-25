@@ -5,15 +5,26 @@ import java.nio.file.Path
 
 import javax.imageio.ImageIO
 
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
+
 /**
- * encloses 3 Path objects; expected, actual and diff
- * resolves 3 file paths, writes images into files
+ * encloses 3 Path objects; the expected image, the actual image, and the diff image.
+ * resolves 3 file paths using the outputDirectory param and the identifier param,
+ * and writes images into 3 files
+ * 
+ * For example,
+ * - &lt;outputDir&gt;/samplePage.exected.png
+ * - &lt;outputDir&gt;/samplePage.actual.png
+ * - &lt;outputDir&gt;/samplePage.diff(0.57).png
  *
  * @author kazurayam
  *
  */
 class ImageDifferenceSerializer {
-
+    
+    static Logger logger_ = LoggerFactory.getLogger(ImageDifferenceSerializer.class)
+    
     private ImageDifference imgDifference_
     private Path outputDirectory_
     private Path expected_

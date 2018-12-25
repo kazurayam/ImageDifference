@@ -2,6 +2,9 @@ package com.kazurayam.imagedifference
 
 import java.awt.image.BufferedImage
 
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
+
 import ru.yandex.qatools.ashot.Screenshot
 import ru.yandex.qatools.ashot.comparison.ImageDiff
 import ru.yandex.qatools.ashot.comparison.ImageDiffer
@@ -11,7 +14,9 @@ import ru.yandex.qatools.ashot.comparison.ImageDiffer
  * and calcurate the ratio of difference of the 2 input images.
  */
 class ImageDifference {
-
+    
+    static Logger logger_ = LoggerFactory.getLogger(ImageDifference.class)
+    
     private BufferedImage expectedImage_
     private BufferedImage actualImage_
     private BufferedImage diffImage_

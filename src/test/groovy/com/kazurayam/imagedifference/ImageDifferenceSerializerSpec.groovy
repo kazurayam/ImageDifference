@@ -16,6 +16,7 @@ class ImageDifferenceSerializerSpec extends Specification {
     private static Path projectDir
     private static File image1_
     private static File image6_
+    private static Path testOutputDir
     
     
     def setupSpec() {
@@ -23,6 +24,7 @@ class ImageDifferenceSerializerSpec extends Specification {
         Path fixtureImagesDir = projectDir.resolve("src/test/resources/fixture/images")
         image1_ = fixtureImagesDir.resolve("andrej.png").toFile()
         image6_ = fixtureImagesDir.resolve("kazurayam.png").toFile()
+        testOutputDir = projectDir.resolve("build/tmp/testOutput")
     }
     def setup() {}
     def cleanup() {}
@@ -30,7 +32,7 @@ class ImageDifferenceSerializerSpec extends Specification {
     
     def testSimilarImages() {
         setup:
-        Path output = projectDir.resolve("build/tmp/testOuput/" + ImageDifferenceSerializerSpec.class.getName() + "/testSimilarImages")
+        Path output = testOutputDir.resolve(ImageDifferenceSerializerSpec.class.getName() + "/testSimilarImages")
         Files.createDirectories(output)
         FileUtils.deleteQuietly(output.toFile())
         when:
@@ -50,7 +52,7 @@ class ImageDifferenceSerializerSpec extends Specification {
     
     def testDifferentImages() {
         setup:
-        Path output = projectDir.resolve("build/tmp/testOuput/" + ImageDifferenceSerializerSpec.class.getName() + "/testDifferentImages")
+        Path output = testOutputDir.resolve(ImageDifferenceSerializerSpec.class.getName() + "/testDifferentImages")
         Files.createDirectories(output)
         FileUtils.deleteQuietly(output.toFile())
         when:

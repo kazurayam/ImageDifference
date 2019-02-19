@@ -19,47 +19,86 @@ import spock.lang.Specification
 
 class ImageCollectionDifferSpec extends Specification {
 
-    private static Path projectDir = Paths.get(".")
-    private static Path fixtureDir = projectDir.resolve('src/test/resources/fixture')
-    private static Path testOutputDir = projectDir.resolve('build/tmp/testOutput')
-    private static Path specOutputDir = testOutputDir.resolve(ImageCollectionDifferSpec.class.getName())
+    private static Path fixtureDir
+    private static Path specOutputDir
 
-    def setupSpec() {}
+    def setupSpec() {
+        Path projectDir = Paths.get(".")
+        fixtureDir = projectDir.resolve("src/test/resources/fixture")
+        Path testOutputDir = projectDir.resolve("build/tmp/testOutput")
+        specOutputDir = testOutputDir.resolve(ImageCollectionDifferSpec.class.getName())
+    }
     def setup() {}
     def cleanup() {}
     def cleanupSpec() {}
 
-    def test_makeImageCollectionDifferences() {
+    /**
+     * PNG file should end with "FAILED.png"
+     */
+    def test_makeImageCollectionDifferences_shouldCreatPngWithFAILED() {
         setup:
-        Path caseOutputDir = specOutputDir.resolve("test_makeImageCollectionDifferences")
+        Path caseOutputDir = specOutputDir.resolve("test_makeImageCollectionDifferences_shouldCreatPngWithFAILED")
         Path materials = caseOutputDir.resolve('Materials')
-        Path reports   = caseOutputDir.resolve('Reports')
         Files.createDirectories(materials)
         FileUtils.deleteQuietly(materials.toFile())
         when:
         boolean materialsCopyResult = Helpers.copyDirectory(fixtureDir.resolve('Materials'), materials)
-        boolean reportsCopyResult   = Helpers.copyDirectory(fixtureDir.resolve('Reports'), reports)
         then:
         materialsCopyResult
-        reportsCopyResult
         when:
         MaterialRepository mr = MaterialRepositoryFactory.createInstance(materials)
         mr.putCurrentTestSuite('Test Suites/ImageDiff', '20181014_060501')
-        then:
         List<MaterialPair> materialPairs =
-            // we use Java 8 Stream API to filter entries
-            mr.createMaterialPairs(new TSuiteName('Test Suites/Main/TS1')).stream().filter { mp ->
-                    mp.getLeft().getFileType() == FileType.PNG
-                }.collect(Collectors.toList())
+        // we use Java 8 Stream API to filter entries
+        mr.createMaterialPairs(new TSuiteName('Test Suites/Main/TS1')).stream().filter { mp ->
+                mp.getLeft().getFileType() == FileType.PNG
+            }.collect(Collectors.toList())
 
         ImageCollectionDiffer icd = new ImageCollectionDiffer(mr)
         icd.makeImageCollectionDifferences(
-                materialPairs,
-                new TCaseName('Test Cases/ImageDiff'),
-                7.0)
+            materialPairs,
+            new TCaseName('Test Cases/ImageDiff'),
+            5.0)          // specified value smaller than the actual diff ratio (6.72)
         //
         then:
         Files.exists(materials.resolve('ImageDiff/20181014_060501/ImageDiff/Main.Basic'))
-        Files.exists(materials.resolve('ImageDiff/20181014_060501/ImageDiff/Main.Basic/CURA_Appointment.20181014_060500_product-20181014_060501_develop.(0.01).png'))
+        Files.exists(materials.resolve('ImageDiff/20181014_060501/ImageDiff/Main.Basic/' +
+            'CURA_Homepage.20181014_060500_product-20181014_060501_develop.(6.72)FAILED.png'))
     }
+    
+    /**
+     * PNG file should not end with "FAILED.png"
+     */
+    def test_makeImageCollectionDifferences_shouldCreatPngWithoutFAILED() {
+        setup:
+        Path caseOutputDir = specOutputDir.resolve("test_makeImageCollectionDifferences_shouldCreatPngWithoutFAILED")
+        Path materials = caseOutputDir.resolve('Materials')
+        Files.createDirectories(materials)
+        FileUtils.deleteQuietly(materials.toFile())
+        when:
+        boolean materialsCopyResult = Helpers.copyDirectory(fixtureDir.resolve('Materials'), materials)
+        then:
+        materialsCopyResult
+        when:
+        MaterialRepository mr = MaterialRepositoryFactory.createInstance(materials)
+        mr.putCurrentTestSuite('Test Suites/ImageDiff', '20181014_060501')
+        List<MaterialPair> materialPairs =
+        // we use Java 8 Stream API to filter entries
+        mr.createMaterialPairs(new TSuiteName('Test Suites/Main/TS1')).stream().filter { mp ->
+                mp.getLeft().getFileType() == FileType.PNG
+            }.collect(Collectors.toList())
+
+        ImageCollectionDiffer icd = new ImageCollectionDiffer(mr)
+        icd.makeImageCollectionDifferences(
+            materialPairs,
+            new TCaseName('Test Cases/ImageDiff'),
+            10.0)          // specified value larger than the actual diff ratio (6.72)
+        //
+        then:
+        Files.exists(materials.resolve('ImageDiff/20181014_060501/ImageDiff/Main.Basic'))
+        Files.exists(materials.resolve('ImageDiff/20181014_060501/ImageDiff/Main.Basic/' +
+            'CURA_Homepage.20181014_060500_product-20181014_060501_develop.(6.72).png'))   
+            // here we expect the file to be (6.72).png, rather than (6.72)FAILED.png
+    }
+
 }

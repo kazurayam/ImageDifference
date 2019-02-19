@@ -39,7 +39,7 @@ class ImageDifferenceFilenameResolverDefaultImplSpec extends Specification {
 
     def test_resolveImageDifferenceFilename() {
         setup:
-        Path caseOutputDir = specOutputDir.resolve("test_resolveImageDifferenceFilename_whenFAILED")
+        Path caseOutputDir = specOutputDir.resolve("test_resolveImageDifferenceFilename")
         Path materials = caseOutputDir.resolve('Materials')
         Path reports = caseOutputDir.resolve('Reports')
         Files.createDirectories(materials)
@@ -81,7 +81,7 @@ class ImageDifferenceFilenameResolverDefaultImplSpec extends Specification {
         diff != null
         when:
         // verify the case of criteriaPercent is less than the actual diff magnitude -> file name should be FAILED.png
-        Double criteriaPercentF = 5.0
+        double criteriaPercentF = 5.0
         ImageDifferenceFilenameResolverDefaultImpl instanceF = new ImageDifferenceFilenameResolverDefaultImpl()
         String fileNameF = instanceF.resolveImageDifferenceFilename(expMate, actMate, diff, criteriaPercentF)
         then:

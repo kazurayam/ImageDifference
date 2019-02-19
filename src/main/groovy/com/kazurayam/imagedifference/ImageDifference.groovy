@@ -21,8 +21,7 @@ class ImageDifference {
     private BufferedImage actualImage_
     private BufferedImage diffImage_
     private Double ratio_ = 0.0        // percentage
-    private Double criteria_ = 1.0     // percentage
-
+    
     ImageDifference()
     {
         expectedImage_ = null
@@ -56,14 +55,6 @@ class ImageDifference {
 
     BufferedImage getDiffImage() {
         return diffImage_
-    }
-
-    void setCriteria(Double criteria) {
-        criteria_ = criteria
-    }
-
-    Double getCriteria() {
-        return criteria_
     }
 
     /**
@@ -107,8 +98,8 @@ class ImageDifference {
      *         greater difference than the criteria = these are different enough,
      *         otherwise false.
      */
-    Boolean imagesAreDifferent() {
-        return (ratio_ > criteria_)
+    Boolean imagesAreDifferent(double criteria) {
+        return (ratio_ > criteria)
     }
 
     /**
@@ -116,7 +107,7 @@ class ImageDifference {
      *         smaller difference than the criteria = these are similar enough,
      *         otherwise false.
      */
-    Boolean imagesAreSimilar() {
-        return (ratio_ <= criteria_)
+    Boolean imagesAreSimilar(double criteria) {
+        return (ratio_ <= criteria)
     }
 }

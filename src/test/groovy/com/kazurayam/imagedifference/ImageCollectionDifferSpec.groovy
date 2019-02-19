@@ -35,16 +35,19 @@ class ImageCollectionDifferSpec extends Specification {
     /**
      * PNG file should end with "FAILED.png"
      */
-    def test_makeImageCollectionDifferences_shouldCreatPngWithFAILED() {
+    def test_makeImageCollectionDifferences_shouldCreatePngWithFAILED() {
         setup:
-        Path caseOutputDir = specOutputDir.resolve("test_makeImageCollectionDifferences_shouldCreatPngWithFAILED")
+        Path caseOutputDir = specOutputDir.resolve("test_makeImageCollectionDifferences_shouldCreatePngWithFAILED")
         Path materials = caseOutputDir.resolve('Materials')
+        Path reports = caseOutputDir.resolve('Reports')
         Files.createDirectories(materials)
         FileUtils.deleteQuietly(materials.toFile())
         when:
         boolean materialsCopyResult = Helpers.copyDirectory(fixtureDir.resolve('Materials'), materials)
+        boolean reportsCopyResult = Helpers.copyDirectory(fixtureDir.resolve('Reports'), reports)
         then:
         materialsCopyResult
+        reportsCopyResult
         when:
         MaterialRepository mr = MaterialRepositoryFactory.createInstance(materials)
         mr.putCurrentTestSuite('Test Suites/ImageDiff', '20181014_060501')
@@ -69,16 +72,19 @@ class ImageCollectionDifferSpec extends Specification {
     /**
      * PNG file should not end with "FAILED.png"
      */
-    def test_makeImageCollectionDifferences_shouldCreatPngWithoutFAILED() {
+    def test_makeImageCollectionDifferences_shouldCreatePngWithoutFAILED() {
         setup:
-        Path caseOutputDir = specOutputDir.resolve("test_makeImageCollectionDifferences_shouldCreatPngWithoutFAILED")
+        Path caseOutputDir = specOutputDir.resolve("test_makeImageCollectionDifferences_shouldCreatePngWithoutFAILED")
         Path materials = caseOutputDir.resolve('Materials')
+        Path reports = caseOutputDir.resolve('Reports')
         Files.createDirectories(materials)
         FileUtils.deleteQuietly(materials.toFile())
         when:
         boolean materialsCopyResult = Helpers.copyDirectory(fixtureDir.resolve('Materials'), materials)
+        boolean reportsCopyResult = Helpers.copyDirectory(fixtureDir.resolve('Reports'), reports)
         then:
         materialsCopyResult
+        reportsCopyResult
         when:
         MaterialRepository mr = MaterialRepositoryFactory.createInstance(materials)
         mr.putCurrentTestSuite('Test Suites/ImageDiff', '20181014_060501')

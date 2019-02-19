@@ -78,7 +78,7 @@ class ImageCollectionDiffer {
     void makeImageCollectionDifferences(
             List<MaterialPair> materialPairs,
             TCaseName tCaseName,
-            Double criteriaPercent) {
+            double criteriaPercent) {
 
         Statistics stats = new Statistics()
 

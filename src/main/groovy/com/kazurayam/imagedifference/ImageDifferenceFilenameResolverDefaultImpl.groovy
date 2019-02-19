@@ -22,7 +22,7 @@ class ImageDifferenceFilenameResolverDefaultImpl implements ImageDifferenceFilen
             Material expMate,
             Material actMate,
             ImageDifference diff,
-            Double criteriaPercent) {
+            double criteriaPercent) {
         
         // FIXME: the depencency to the "Reports" directory here makes this method fragile
         //        should parameterize those ExecutionProfiles  
@@ -41,7 +41,7 @@ class ImageDifferenceFilenameResolverDefaultImpl implements ImageDifferenceFilen
         sb.append("${actTimestamp}_${profileActual}")
         sb.append(".")
         sb.append("(${diff.getRatioAsString()})")
-        sb.append("${(diff.imagesAreSimilar()) ? '.png' : 'FAILED.png'}")
+        sb.append("${(diff.imagesAreSimilar(criteriaPercent)) ? '.png' : 'FAILED.png'}")
         return sb.toString()
     }
 }

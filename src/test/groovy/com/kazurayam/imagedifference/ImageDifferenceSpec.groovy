@@ -30,11 +30,11 @@ class ImageDifferenceSpec extends Specification {
         BufferedImage biy = ImageIO.read(image6_)
         when:
         ImageDifference difference = new ImageDifference(bix, biy)
-        difference.setCriteria(15.0)
+        double criteria = 15.0
         then:
-        difference.getRatio() <= 15.0
-        difference.imagesAreSimilar()
-        ! difference.imagesAreDifferent()
+        difference.getRatio() <= criteria
+        difference.imagesAreSimilar(criteria)
+        ! difference.imagesAreDifferent(criteria)
     }
 
     
@@ -44,11 +44,11 @@ class ImageDifferenceSpec extends Specification {
         BufferedImage bi6 = ImageIO.read(image6_)
         when:
         ImageDifference difference = new ImageDifference(bi1, bi6)
-        difference.setCriteria(15.0)
+        double criteria = 15.0
         then:
-        difference.getRatio() > 15.0
-        difference.imagesAreDifferent()
-        ! difference.imagesAreSimilar()
+        difference.getRatio() > criteria
+        difference.imagesAreDifferent(criteria)
+        ! difference.imagesAreSimilar(criteria)
     }
     
 }

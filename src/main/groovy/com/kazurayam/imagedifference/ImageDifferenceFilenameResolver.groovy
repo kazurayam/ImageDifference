@@ -13,5 +13,5 @@ interface ImageDifferenceFilenameResolver {
             Material expectedMaterial,
             Material actualMaterial,
             ImageDifference imageDifference,
-            Double criteriaPercent)
+            double criteriaPercent)
 }

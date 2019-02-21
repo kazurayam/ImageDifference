@@ -6,7 +6,7 @@ apply plugin: 'maven'
 
 group    = 'com.kazurayam'
 //artifact = 'Materials'
-version  = '0.5.0'
+version  = '0.5.1'
 
 sourceCompatibility = '1.8'
 targetCompatibility = '1.8'
@@ -37,7 +37,7 @@ dependencies {
     // https://mvnrepository.com/artifact/ru.yandex.qatools.ashot/ashot
     compile group: 'ru.yandex.qatools.ashot', name: 'ashot', version: '1.5.4'
 
-    compile group: 'com.kazurayam', name: 'Materials', version: '0.31.1'
+    compile group: 'com.kazurayam', name: 'Materials', version: '0.33.1'
 
     // https://mvnrepository.com/artifact/org.spockframework/spock-core
     testCompile group: 'org.spockframework', name: 'spock-core', version: '1.1-groovy-2.4'
@@ -54,9 +54,9 @@ test {
 }
 
 task pinpoint(type: Test) {
-    include '**/ImageDifferenceSpec.class'
-    include '**/imagedifference/ImageCollectionDifferSpec.class'
-    include '**/ImageDifferenceFilenameResolverDefaultImplSpec.class'
+    //include '**/ImageDifferenceSpec.class'
+    include '**/ImageCollectionDifferSpec.class'
+    //include '**/ImageDifferenceFilenameResolverDefaultImplSpec.class'
     outputs.upToDateWhen {false}
 }
 

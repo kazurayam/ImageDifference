@@ -9,12 +9,19 @@ import org.apache.commons.io.FileUtils
 
 import com.kazurayam.materials.FileType
 import com.kazurayam.materials.Helpers
+import com.kazurayam.materials.ImageDeltaStats
 import com.kazurayam.materials.MaterialPair
 import com.kazurayam.materials.MaterialRepository
 import com.kazurayam.materials.MaterialRepositoryFactory
+import com.kazurayam.materials.MaterialStorage
+import com.kazurayam.materials.MaterialStorageFactory
+import com.kazurayam.materials.stats.StorageScanner
 import com.kazurayam.materials.TCaseName
 import com.kazurayam.materials.TSuiteName
+import com.kazurayam.materials.impl.TSuiteResultIdImpl
+import com.kazurayam.materials.TSuiteTimestamp
 
+import spock.lang.Ignore
 import spock.lang.Specification
 
 class ImageCollectionDifferSpec extends Specification {
@@ -24,7 +31,7 @@ class ImageCollectionDifferSpec extends Specification {
 
     def setupSpec() {
         Path projectDir = Paths.get(".")
-        fixtureDir = projectDir.resolve("src/test/resources/fixture")
+        fixtureDir = projectDir.resolve("src/test/fixture")
         Path testOutputDir = projectDir.resolve("build/tmp/testOutput")
         specOutputDir = testOutputDir.resolve(ImageCollectionDifferSpec.class.getName())
     }
@@ -35,9 +42,9 @@ class ImageCollectionDifferSpec extends Specification {
     /**
      * PNG file should end with "FAILED.png"
      */
-    def test_makeImageCollectionDifferences_shouldCreatePngWithFAILED() {
+    def test_makeImageCollectionDifferences_twins_shouldCreatePngWithFAILED() {
         setup:
-        Path caseOutputDir = specOutputDir.resolve("test_makeImageCollectionDifferences_shouldCreatePngWithFAILED")
+        Path caseOutputDir = specOutputDir.resolve("test_makeImageCollectionDifferences_twins_shouldCreatePngWithFAILED")
         Path materials = caseOutputDir.resolve('Materials')
         Path reports = caseOutputDir.resolve('Reports')
         Files.createDirectories(materials)
@@ -72,9 +79,9 @@ class ImageCollectionDifferSpec extends Specification {
     /**
      * PNG file should not end with "FAILED.png"
      */
-    def test_makeImageCollectionDifferences_shouldCreatePngWithoutFAILED() {
+    def test_makeImageCollectionDifferences_twins_shouldCreatePngWithoutFAILED() {
         setup:
-        Path caseOutputDir = specOutputDir.resolve("test_makeImageCollectionDifferences_shouldCreatePngWithoutFAILED")
+        Path caseOutputDir = specOutputDir.resolve("test_makeImageCollectionDifferences_twins_shouldCreatePngWithoutFAILED")
         Path materials = caseOutputDir.resolve('Materials')
         Path reports = caseOutputDir.resolve('Reports')
         Files.createDirectories(materials)
@@ -89,8 +96,8 @@ class ImageCollectionDifferSpec extends Specification {
         MaterialRepository mr = MaterialRepositoryFactory.createInstance(materials)
         mr.putCurrentTestSuite('Test Suites/ImageDiff', '20181014_060501')
         List<MaterialPair> materialPairs =
-        // we use Java 8 Stream API to filter entries
-        mr.createMaterialPairs(new TSuiteName('Test Suites/Main/TS1')).stream().filter { mp ->
+            // we use Java 8 Stream API to filter entries
+            mr.createMaterialPairs(new TSuiteName('Test Suites/Main/TS1')).stream().filter { mp ->
                 mp.getLeft().getFileType() == FileType.PNG
             }.collect(Collectors.toList())
 
@@ -107,4 +114,40 @@ class ImageCollectionDifferSpec extends Specification {
             // here we expect the file to be (6.72).png, rather than (6.72)FAILED.png
     }
 
+    /**
+     * run ImageCollectionDiffer#makeImageCollectionDifferences() with ImageDeletaStats object as an arugment
+     * @return
+     */
+    @Ignore
+    def test_makeImageCollectionDifferences_chronos() {
+        setup:
+        Path caseOutputDir = specOutputDir.resolve("test_makeImageCollectionDifferences_chronos")
+        Path materials = caseOutputDir.resolve('Materials')
+        Path storage = caseOutputDir.resolve('Storage')
+        Files.createDirectories(materials)
+        FileUtils.deleteQuietly(materials.toFile())
+        assert Helpers.copyDirectory(fixtureDir.resolve('Storage'), storage)
+        MaterialRepository mr = MaterialRepositoryFactory.createInstance(materials)
+        MaterialStorage ms = MaterialStorageFactory.createInstance(storage)
+        TSuiteName tsn = new TSuiteName('47News_chronos_capture')
+        ms.restore(mr, new TSuiteResultIdImpl(tsn, TSuiteTimestamp.newInstance('20190216_204329')))
+        ms.restore(mr, new TSuiteResultIdImpl(tsn, TSuiteTimestamp.newInstance('20190216_064354')))
+        mr.scan()
+        mr.putCurrentTestSuite('Test Suites/ImageDiff', '20190216_210203')
+        when:
+        // we use Java 8 Stream API to filter entries
+        List<MaterialPair> materialPairs =
+            mr.createMaterialPairs(tsn).stream().filter { mp ->
+                mp.getLeft().getFileType() == FileType.PNG
+            }.collect(Collectors.toList())
+        StorageScanner storageScanner = new StorageScanner(ms, new StorageScanner.Options.Builder().build())
+        ImageDeltaStats imageDeltaStats = storageScanner.scan(tsn)
+        ImageCollectionDiffer icd = new ImageCollectionDiffer(mr)
+        icd.makeImageCollectionDifferences(
+            materialPairs,
+            new TCaseName('Test Cases/ImageDiff'),
+            imageDeltaStats)
+        then:
+        false
+    }
 }

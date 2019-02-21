@@ -27,7 +27,7 @@
 		</attributes>
 	</classpathentry>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.8/"/>
-	<classpathentry kind="lib" path="C:/Users/qcq0264/.m2/repository/com/kazurayam/Materials/0.31.1/Materials-0.31.1.jar">
+	<classpathentry kind="lib" path="C:/Users/qcq0264/.m2/repository/com/kazurayam/Materials/0.33.1/Materials-0.33.1.jar">
 		<attributes>
 			<attribute name="gradle_used_by_scope" value="main,test"/>
 		</attributes>
@@ -147,5 +147,5 @@
 			<attribute name="gradle_used_by_scope" value="test"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="output" path="build/classes/groovy/main"/>
+	<classpathentry kind="output" path="bin/default"/>
 </classpath>

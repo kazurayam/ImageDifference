@@ -4,6 +4,10 @@ import java.nio.file.Path
 
 import javax.imageio.ImageIO
 
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
+
+import com.kazurayam.materials.ImageDeltaStats
 import com.kazurayam.materials.Material
 import com.kazurayam.materials.MaterialPair
 import com.kazurayam.materials.MaterialRepository
@@ -23,6 +27,8 @@ import com.kazurayam.materials.TCaseName
  * @author kazurayam
  */
 class ImageCollectionDiffer {
+    
+    static Logger logger_ = LoggerFactory.getLogger(ImageCollectionDiffer.class)
 
     private MaterialRepository mr_
     private ImageDifferenceFilenameResolver idfResolver_
@@ -60,6 +66,23 @@ class ImageCollectionDiffer {
     }
 
     /**
+     * 
+     * @param materialPairs
+     * @param tCaseName
+     * @param imageDeltaStats
+     */
+    void makeImageCollectionDifferences(
+            List<MaterialPair> materialPairs,
+            TCaseName tCaseName,
+            ImageDeltaStats imageDeltaStats) {
+        // iterate over the list of Materials
+        for (MaterialPair pair : materialPairs) {
+            double criteriaPercentage = 0.0
+            this.writeDiffImage(pair.getExpected(), pair.getActual(), tCaseName, criteriaPercentage)
+        }
+    }
+        
+    /**
      * compare 2 Material files in each MaterialPair object,
      * create ImageDiff and store the diff image files under the directory
      * 
@@ -70,7 +93,7 @@ class ImageCollectionDiffer {
      *
      * @param materialPairs created by
      *     com.kazurayam.materials.MaterialRpository#createMaterialPairs() method
-     * @param tCaseName     created by com.kazurayam.materials.TCaseName(String)
+     * @param tCaseName the name of test case which called the ImageCollectionDiffer#makeImageCollectionDifferences()
      * @param criteriaPercent e.g. 3.00 percent. If the difference of
      *     a MaterialPair is greater than this,
      *     the MaterialPair is evaluated FAILED
@@ -79,105 +102,46 @@ class ImageCollectionDiffer {
             List<MaterialPair> materialPairs,
             TCaseName tCaseName,
             double criteriaPercent) {
-
-        Statistics stats = new Statistics()
-
         // iterate over the list of Materials
         for (MaterialPair pair : materialPairs) {
-
-            Material expMate = pair.getExpected()
-            Material actMate = pair.getActual()
-
-            // create ImageDifference of the 2 given images
-            ImageDifference diff = new ImageDifference(
-                    ImageIO.read(expMate.getPath().toFile()),
-                    ImageIO.read(actMate.getPath().toFile()))
-
-            // record this pair
-            stats.add(diff)
-
-            // resolve the name of output file to save the ImageDiff
-            String fileName = idfResolver_.resolveImageDifferenceFilename(
-                    expMate,
-                    actMate,
-                    diff,
-                    criteriaPercent)
-
-            // resolve the path of output file to save the ImageDiff
-            Path pngFile = mr_.resolveMaterialPath(
-                    tCaseName,
-                    expMate.getDirpathRelativeToTSuiteResult(),
-                    fileName)
-
-            // write the ImageDiff into the output file
-            ImageIO.write(diff.getDiffImage(), "PNG", pngFile.toFile())
-
-            // verify the diffRatio, fail the test if the ratio is greater than criteria
-            if (diff.getRatio() > criteriaPercent && listener_ != null) {
-                listener_.failed(">>> diffRatio = ${diff.getRatio()} is exceeding criteria = ${criteriaPercent}")
-            }
-
+            this.writeDiffImage(pair.getExpected(), pair.getActual(), tCaseName, criteriaPercent)
         }
-
-        // show statistics for making debugging easier
-        listener_.info(">>> #makeDiffs ${stats.toString()}")
-        listener_.info(">>> #makeDiffs average of diffRatios is ${String.format('%.2f', stats.diffRatioAverage())}")
-        listener_.info(">>> #makeDiffs standard deviation of diffRatio is ${String.format('%.2f', stats.evalStandardDeviation())}")
-        listener_.info(">>> #makeDiffs recommended criteria is ${String.format('%.2f', stats.evalRecommendedCriteria(1.6))}")
     }
-
+    
+    
     /**
-     *
+     * 
+     * @param expMate
+     * @param actMate
+     * @param tCaseName
+     * @param criteriaPercent
+     * @return
      */
-    class Statistics {
+    private writeDiffImage(Material expMate, Material actMate, TCaseName tCaseName, double criteriaPercent) {
+        // create ImageDifference of the 2 given images
+        ImageDifference diff = new ImageDifference(
+                ImageIO.read(expMate.getPath().toFile()),
+                ImageIO.read(actMate.getPath().toFile()))
 
-        private List<ImageDifference> list_
+        // resolve the name of output file to save the ImageDiff
+        String fileName = idfResolver_.resolveImageDifferenceFilename(
+                expMate,
+                actMate,
+                diff,
+                criteriaPercent)
 
-        Statistics() {
-            list_ = new ArrayList<ImageDifference>()
-        }
+        // resolve the path of output file to save the ImageDiff
+        Path pngFile = mr_.resolveMaterialPath(
+                tCaseName,
+                expMate.getDirpathRelativeToTSuiteResult(),
+                fileName)
 
-        void add(ImageDifference diff) {
-            list_.add(diff)
-        }
+        // write the ImageDiff into the output file
+        ImageIO.write(diff.getDiffImage(), "PNG", pngFile.toFile())
 
-        String toString() {
-            StringBuilder sb = new StringBuilder()
-            sb.append(">>> # diffRatio: ")
-            sb.append("[")
-            def count = 0
-            for (ImageDifference diff : list_) {
-                if (count > 0) {
-                    sb.append(", ")
-                }
-                sb.append(diff.getRatioAsString())
-                count += 1
-            }
-            sb.append("] percent")
-            return sb.toString()
-        }
-
-        Double diffRatioAverage() {
-            Double sum = 0.0
-            for (ImageDifference diff : list_) {
-                sum += diff.getRatio()
-            }
-            return sum / list_.size()
-        }
-
-        Double evalStandardDeviation() {
-            Double average = this.diffRatioAverage()
-            Double s = 0.0
-            for (ImageDifference diff : list_) {
-                s += (average - diff.getRatio()) * (average - diff.getRatio())
-            }
-            return Math.sqrt(s / list_.size)
-        }
-
-        Double evalRecommendedCriteria(Double factor = 1.5) {
-            Double average = this.diffRatioAverage()
-            Double stddevi = this.evalStandardDeviation()
-            return average + stddevi * factor
+        // verify the diffRatio, fail the test if the ratio is greater than criteria
+        if (diff.getRatio() > criteriaPercent && listener_ != null) {
+            listener_.failed(">>> diffRatio = ${diff.getRatio()} is exceeding criteria = ${criteriaPercent}")
         }
     }
 

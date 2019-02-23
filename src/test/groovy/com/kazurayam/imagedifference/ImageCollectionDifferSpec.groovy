@@ -10,18 +10,21 @@ import org.apache.commons.io.FileUtils
 import com.kazurayam.materials.FileType
 import com.kazurayam.materials.Helpers
 import com.kazurayam.materials.ImageDeltaStats
+import com.kazurayam.materials.Material
 import com.kazurayam.materials.MaterialPair
 import com.kazurayam.materials.MaterialRepository
 import com.kazurayam.materials.MaterialRepositoryFactory
 import com.kazurayam.materials.MaterialStorage
 import com.kazurayam.materials.MaterialStorageFactory
-import com.kazurayam.materials.stats.StorageScanner
 import com.kazurayam.materials.TCaseName
+import com.kazurayam.materials.TCaseResult
 import com.kazurayam.materials.TSuiteName
-import com.kazurayam.materials.impl.TSuiteResultIdImpl
+import com.kazurayam.materials.TSuiteResult
+import com.kazurayam.materials.TSuiteResultId
 import com.kazurayam.materials.TSuiteTimestamp
+import com.kazurayam.materials.impl.TSuiteResultIdImpl
+import com.kazurayam.materials.stats.StorageScanner
 
-import spock.lang.Ignore
 import spock.lang.Specification
 
 class ImageCollectionDifferSpec extends Specification {
@@ -118,7 +121,6 @@ class ImageCollectionDifferSpec extends Specification {
      * run ImageCollectionDiffer#makeImageCollectionDifferences() with ImageDeletaStats object as an arugment
      * @return
      */
-    @Ignore
     def test_makeImageCollectionDifferences_chronos() {
         setup:
         Path caseOutputDir = specOutputDir.resolve("test_makeImageCollectionDifferences_chronos")
@@ -142,12 +144,27 @@ class ImageCollectionDifferSpec extends Specification {
             }.collect(Collectors.toList())
         StorageScanner storageScanner = new StorageScanner(ms, new StorageScanner.Options.Builder().build())
         ImageDeltaStats imageDeltaStats = storageScanner.scan(tsn)
+        double ccp = imageDeltaStats.getCalculatedCriteriaPercentage(
+                            new TSuiteName("47News_chronos_capture"),
+                            Paths.get('main.TC_47News.visitSite').resolve('47NEWS_TOP.png'))
+        then:
+        15.0 < ccp && ccp < 16.0 // ccp == 15.197159598135954
+        when:
         ImageCollectionDiffer icd = new ImageCollectionDiffer(mr)
         icd.makeImageCollectionDifferences(
             materialPairs,
             new TCaseName('Test Cases/ImageDiff'),
             imageDeltaStats)
+        mr.scan()
+        List<TSuiteResultId> tsriList = mr.getTSuiteResultIdList(new TSuiteName('Test Suites/ImageDiff'))
+        assert tsriList.size() == 1
+        TSuiteResultId tsri = tsriList.get(0)
+        TSuiteResult tsr = mr.getTSuiteResult(tsri)
+        TCaseResult tcr = tsr.getTCaseResult(new TCaseName("Test Cases/ImageDiff"))
+        List<Material> mateList = tcr.getMaterialList()
+        assert mateList.size() == 1
+        Material diffImage = mateList.get(0)
         then:
-        false
+        diffImage.getPath().toString().endsWith('FAILED.png')
     }
 }

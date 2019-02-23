@@ -15,7 +15,7 @@
 	<classpathentry kind="con" path="org.eclipse.buildship.core.gradleclasspathcontainer"/>
 	<classpathentry exported="true" kind="con" path="GROOVY_DSL_SUPPORT"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.8/"/>
-	<classpathentry kind="lib" path="/Users/urayamakazuaki/.m2/repository/com/kazurayam/Materials/0.34.0/Materials-0.34.0.jar">
+	<classpathentry kind="lib" path="/Users/urayamakazuaki/.m2/repository/com/kazurayam/Materials/0.36.1/Materials-0.36.1.jar">
 		<attributes>
 			<attribute name="gradle_used_by_scope" value="main,test"/>
 		</attributes>

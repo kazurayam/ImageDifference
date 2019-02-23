@@ -5,8 +5,8 @@ apply plugin: 'jacoco'
 apply plugin: 'maven'
 
 group    = 'com.kazurayam'
-//artifact = 'Materials'
-version  = '0.5.1'
+//artifact = 'ImageDifference'
+version  = '0.6.0'
 
 sourceCompatibility = '1.8'
 targetCompatibility = '1.8'

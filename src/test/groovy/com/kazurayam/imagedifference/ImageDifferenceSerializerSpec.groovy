@@ -21,7 +21,7 @@ class ImageDifferenceSerializerSpec extends Specification {
     
     def setupSpec() {
         projectDir = Paths.get(".")
-        Path fixtureImagesDir = projectDir.resolve("src/test/resources/fixture/images")
+        Path fixtureImagesDir = projectDir.resolve("src/test/fixture/images")
         image1_ = fixtureImagesDir.resolve("andrej.png").toFile()
         image6_ = fixtureImagesDir.resolve("kazurayam.png").toFile()
         testOutputDir = projectDir.resolve("build/tmp/testOutput")

@@ -29,7 +29,7 @@ class ImageDifferenceFilenameResolverDefaultImplSpec extends Specification {
     
     def setupSpec() {
         Path projectDir = Paths.get(".")
-        fixtureDir = projectDir.resolve("src/test/resources/fixture")
+        fixtureDir = projectDir.resolve("src/test/fixture")
         Path testOutputDir = projectDir.resolve("build/tmp/testOutput")
         specOutputDir = testOutputDir.resolve(ImageDifferenceFilenameResolverDefaultImplSpec.class.getName())
     }

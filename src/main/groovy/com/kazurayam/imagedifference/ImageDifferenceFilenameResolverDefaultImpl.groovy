@@ -1,7 +1,13 @@
 package com.kazurayam.imagedifference
 
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
+
 import com.kazurayam.materials.ExecutionProfile
+import com.kazurayam.materials.view.ExecutionProfileImpl
+import com.kazurayam.materials.view.ExecutionPropertiesWrapper
 import com.kazurayam.materials.Material
+import com.kazurayam.materials.TSuiteResult
 
 /**
  *
@@ -9,6 +15,9 @@ import com.kazurayam.materials.Material
  *
  */
 class ImageDifferenceFilenameResolverDefaultImpl implements ImageDifferenceFilenameResolver {
+    
+    static Logger logger_ = LoggerFactory.getLogger(ImageDifferenceFilenameResolverDefaultImpl.class)
+    
     /**
      * Given with the following arguments:
      *     Material expMate:                 'Materials/Main/TS1/20181014_131314/CURA_Homepage' created by TSuiteResult with 'product' profile
@@ -26,8 +35,21 @@ class ImageDifferenceFilenameResolverDefaultImpl implements ImageDifferenceFilen
         
         // FIXME: the depencency to the "Reports" directory here makes this method fragile
         //        should parameterize those ExecutionProfiles  
-        ExecutionProfile profileExpected = expMate.getParent().getParent().getExecutionPropertiesWrapper().getExecutionProfile()
-        ExecutionProfile profileActual   = actMate.getParent().getParent().getExecutionPropertiesWrapper().getExecutionProfile()
+        TSuiteResult tSuiteResultExpected = expMate.getParent().getParent()
+        TSuiteResult tSuiteResultActual   = actMate.getParent().getParent()
+        logger_.debug("#resolveImageDifferenceFilename tSuiteResultExpected=${tSuiteResultExpected}")
+        logger_.debug("#resolveImageDifferenceFilename tSuiteResultActual  =${tSuiteResultActual}")
+        
+        ExecutionPropertiesWrapper epwExpected = tSuiteResultExpected.getExecutionPropertiesWrapper()
+        ExecutionPropertiesWrapper epwActual   = tSuiteResultActual.getExecutionPropertiesWrapper()
+        logger_.debug("#resolveImageDifferenceFilename epwExpected=${epwExpected}")
+        logger_.debug("#resolveImageDifferenceFilename epwActual  =${epwActual}")
+        
+        ExecutionProfile profileExpected = (epwExpected != null) ? epwExpected.getExecutionProfile() : ExecutionProfileImpl.BLANK
+        ExecutionProfile profileActual   = (epwActual   != null) ? epwActual.getExecutionProfile()   : ExecutionProfileImpl.BLANK
+        logger_.debug("#resolveImageDifferenceFilename profileExpected=${profileExpected}")
+        logger_.debug("#resolveImageDifferenceFilename profileActual  =${profileActual}")
+        
         //
         String fileName = expMate.getPath().getFileName().toString()
         String fileId = fileName.substring(0, fileName.lastIndexOf('.'))
